@@ -1,0 +1,21 @@
+{
+  "run_started_utc": "2026-11-20T16:32:55Z",
+  "run_finished_utc": "2026-11-20T18:42:51Z",
+  "duration_seconds": 7796.1,
+  "baseline_period": "2017-01-01 to 2017-12-31",
+  "recent_period": "2025-11-20 to 2026-11-20",
+  "districts_built": [
+    "coimbatore_tamil_nadu",
+    "dehradun_uttarakhand",
+    "nagpur_maharashtra",
+    "ernakulam_kerala",
+    "jaipur_rajasthan",
+    "bengaluru_urban_karnataka",
+    "kamrup_assam",
+    "nashik_maharashtra",
+    "ludhiana_punjab",
+    "visakhapatnam_ap"
+  ],
+  "districts_failed": [],
+  "status": "success"
+}

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Geo Vision Plan-Net — Smart AI Green Cover Detection & Voice Assistant</title>
+
+  <!-- PWA Manifest & Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="description" content="AI-Powered Deforestation Analysis & Multi-Language Voice Assistant App for Phones & Desktop">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- CDN Dependencies -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body data-theme="dark">
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-logo">🌍</div>
+      <div class="brand-title">
+        <h1>Geo Vision Plan-Net</h1>
+        <p>Smart Green Cover & Voice AI</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- District Selector -->
+      <select id="district-select" class="select-input">
+        <!-- Populated dynamically -->
+      </select>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle-btn" class="btn-action">🌙 Dark</button>
+
+      <!-- Voice Assistant Mic Button -->
+      <button id="voice-mic-btn" class="voice-mic-btn" title="Tap to Speak with AI Assistant">
+        🎙️
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Wrapper -->
+  <main class="main-wrapper">
+
+    <!-- Desktop Navigation Tabs -->
+    <nav class="tab-navigation desktop-tab-nav">
+      <button class="tab-btn active" data-tab="overview">📊 Executive Overview</button>
+      <button class="tab-btn" data-tab="map">🗺️ GIS & NDVI Map</button>
+      <button class="tab-btn" data-tab="analytics">📈 Trend Analytics</button>
+      <button class="tab-btn" data-tab="compare">⚖️ Compare Districts</button>
+      <button class="tab-btn" data-tab="voice">🤖 AI Voice Assistant</button>
+    </nav>
+
+    <!-- Tab 1: Executive Overview -->
+    <section id="tab-overview" class="tab-content active">
+      <div class="content-card" style="margin-bottom: 1.25rem;">
+        <div class="card-header">
+          <div>
+            <h2 id="district-title" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-emerald);">Wayanad District</h2>
+            <p id="study-period-text" style="font-size: 0.8rem; color: var(--text-secondary);">Study Period: 2023 - 2026</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button id="download-pdf-btn" class="btn-action btn-primary">📄 Export PDF</button>
+          </div>
+        </div>
+
+        <p id="exec-summary-text" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 1rem;">
+          Loading executive summary...
+        </p>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card loss">
+            <div class="kpi-label">Veg. Loss</div>
+            <div id="kpi-loss" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Hectares</div>
+          </div>
+          <div class="kpi-card gain">
+            <div class="kpi-label">Veg. Gain</div>
+            <div id="kpi-gain" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Hectares</div>
+          </div>
+          <div class="kpi-card encroachment">
+            <div class="kpi-label">Protected Encroachment</div>
+            <div id="kpi-encroachment" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Hectares</div>
+          </div>
+          <div class="kpi-card buffer">
+            <div class="kpi-label">Buffer Violation</div>
+            <div id="kpi-buffer" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Hectares</div>
+          </div>
+          <div class="kpi-card loss">
+            <div class="kpi-label">Severe Loss</div>
+            <div id="kpi-severe" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Hectares</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Total Flagged</div>
+            <div id="kpi-total" class="kpi-value">0 ha</div>
+            <div class="kpi-unit">Total Violations</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Risk Level</div>
+            <div id="kpi-risk" class="kpi-value" style="color: var(--color-red);">0/100</div>
+            <div class="kpi-unit">Threat Index</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Charts Grid -->
+      <div class="dashboard-grid">
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">📈 Multi-Year Vegetation Trend</h3>
+          </div>
+          <div style="height: 300px;">
+            <canvas id="trend-chart-canvas"></canvas>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">🛡️ Recommended Conservation Actions</h3>
+          </div>
+          <ul id="recommendations-list" style="list-style-type: none; display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.9rem;">
+            <li style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--accent-emerald);">
+              🛰️ Deploy drone surveillance teams along eco-sensitive corridors.
+            </li>
+            <li style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--color-orange);">
+              🛑 Issue immediate stop-work notices for illegal hill cutting in sub-divisions.
+            </li>
+            <li style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 10px; border-left: 4px solid var(--color-purple);">
+              🌱 Initiate native afforestation along degraded riparian buffers.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: GIS & NDVI Map -->
+    <section id="tab-map" class="tab-content">
+      <div class="dashboard-grid">
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">🗺️ Interactive GIS Violation Map</h3>
+          </div>
+          <div id="leaflet-map"></div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title">🔥 NDVI Heatmap Raster Simulator</h3>
+          </div>
+          <div id="ndvi-canvas-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Trend Analytics -->
+    <section id="tab-analytics" class="tab-content">
+      <div class="content-card">
+        <div class="card-header">
+          <h3 class="card-title">📊 Multi-Year Deforestation Analytics</h3>
+        </div>
+        <div style="height: 380px;">
+          <canvas id="analytics-chart-canvas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Compare Districts -->
+    <section id="tab-compare" class="tab-content">
+      <div class="content-card" style="margin-bottom: 1.25rem;">
+        <div class="card-header">
+          <h3 class="card-title">⚖️ District Comparison Tool</h3>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <label style="font-size: 0.85rem; font-weight: 600;">Compare with:</label>
+            <select id="compare-district-select" class="select-input"></select>
+          </div>
+        </div>
+        <div id="comparison-cards-container" class="comparison-grid"></div>
+      </div>
+    </section>
+
+    <!-- Tab 5: AI Voice Assistant -->
+    <section id="tab-voice" class="tab-content">
+      <div class="content-card">
+        <div class="voice-avatar-box">
+          <div id="voice-avatar-pulse" class="avatar-pulse-circle">🤖</div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-top: 0.8rem; color: var(--accent-emerald);">
+            GeoAI Multi-Language Assistant
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.3rem;">
+            Speak in your preferred language to query metrics, switch districts, or generate reports.
+          </p>
+
+          <div style="margin-top: 1rem; display: flex; gap: 0.8rem; align-items: center;">
+            <label style="font-size: 0.85rem; font-weight: 600;">Assistant Language:</label>
+            <select id="voice-lang-select" class="select-input">
+              <option value="en-US">English (US)</option>
+              <option value="hi-IN">Hindi (हिंदी)</option>
+              <option value="ta-IN">Tamil (தமிழ்)</option>
+              <option value="te-IN">Telugu (తెలుగు)</option>
+              <option value="ml-IN">Malayalam (മലയാളം)</option>
+              <option value="kn-IN">Kannada (<ctrl42>కన్నడ)</option>
+              <option value="es-ES">Spanish (Español)</option>
+              <option value="fr-FR">French (Français)</option>
+              <option value="de-DE">German (Deutsch)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Voice Chat Box -->
+        <div class="voice-chat-box">
+          <div id="voice-chat-messages" class="chat-messages">
+            <div class="chat-bubble assistant">
+              <div class="bubble-sender">🤖 GeoAI Assistant</div>
+              <div class="bubble-content">
+                Hello! I am your AI Voice Assistant. Tap the microphone button or type a question to get instant deforestation metrics and reports.
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 0.75rem; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
+            <input type="text" id="chat-input-text" class="select-input" style="flex: 1;" placeholder="Ask a question or type a command...">
+            <button id="send-chat-btn" class="btn-action btn-primary">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Navigation Bar -->
+  <nav class="mobile-nav-bar">
+    <button class="nav-item active" data-tab="overview">
+      <span class="nav-icon">📊</span>
+      <span>Overview</span>
+    </button>
+    <button class="nav-item" data-tab="map">
+      <span class="nav-icon">🗺️</span>
+      <span>Map</span>
+    </button>
+    <button class="nav-item" data-tab="analytics">
+      <span class="nav-icon">📈</span>
+      <span>Trends</span>
+    </button>
+    <button class="nav-item" data-tab="compare">
+      <span class="nav-icon">⚖️</span>
+      <span>Compare</span>
+    </button>
+    <button class="nav-item" data-tab="voice">
+      <span class="nav-icon">🤖</span>
+      <span>Voice AI</span>
+    </button>
+  </nav>
+
+  <!-- App JavaScript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/voice-assistant.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
