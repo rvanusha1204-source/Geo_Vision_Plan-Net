@@ -254,7 +254,7 @@ A negative change in NDVI means the vegetation signal dropped, and a positive ch
 
 ```
 geo-vision-plan-net/
-├── app.py                  # Dashboard server (reads the cache only)
+├── server.py                  # Dashboard server (reads the cache only)
 ├── analysis_pipeline.py    # Earth Engine NDVI and rule-engine pipeline
 ├── build_cache.py          # Builds cache/<district>/ for every district
 ├── js/
@@ -315,7 +315,7 @@ This performs the Earth Engine analysis for each district and writes the results
 <summary><b>4. Launch the dashboard</b></summary>
 
 ```bash
-python app.py
+python server.py
 ```
 
 Open `http://localhost:8000` in a browser.
